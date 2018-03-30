@@ -39,6 +39,10 @@ export class ReactNativeModal extends Component {
     animationOutTiming: PropTypes.number,
     avoidKeyboard: PropTypes.bool,
     backdropColor: PropTypes.string,
+    backdropHitSlop: PropTypes.shape({
+      x: PropTypes.number,
+      y: PropTypes.number
+    }),
     backdropOpacity: PropTypes.number,
     backdropTransitionInTiming: PropTypes.number,
     backdropTransitionOutTiming: PropTypes.number,
@@ -63,6 +67,10 @@ export class ReactNativeModal extends Component {
     animationOutTiming: 300,
     avoidKeyboard: false,
     backdropColor: "black",
+    backdropHitSlop: {
+      x: 20,
+      y: 20
+    },
     backdropOpacity: 0.7,
     backdropTransitionInTiming: 300,
     backdropTransitionOutTiming: 300,
@@ -100,7 +108,7 @@ export class ReactNativeModal extends Component {
       this.state = { ...this.state, pan: new Animated.ValueXY() };
       this.buildPanResponder();
     }
-    this.buildBackdropPanResponder();
+    this.buildBackdropPanResponder(props);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -207,14 +215,15 @@ export class ReactNativeModal extends Component {
     });
   };
 
-  buildBackdropPanResponder = () => {
+  buildBackdropPanResponder = props => {
     this.backdropPanResponder = PanResponder.create({
       onStartShouldSetPanResponder: (evt, gestureState) => true,
       onMoveShouldSetPanResponder: (evt, gestureState) => true,
       onPanResponderTerminationRequest: (evt, gestureState) => false,
       onPanResponderRelease: (evt, gestureState) => {
-        if (gestureState.dx === 0 && gestureState.dy === 0) {
-          this.props.onBackdropPress();
+        const { x, y } = props.backdropHitSlop;
+        if (Math.abs(gestureState.dx) < x && Math.abs(gestureState.dy) < y) {
+          props.onBackdropPress();
         }
       },
       onShouldBlockNativeResponder: (evt, gestureState) => true
