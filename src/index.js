@@ -3,7 +3,6 @@ import {
   Dimensions,
   Modal,
   DeviceEventEmitter,
-  TouchableWithoutFeedback,
   KeyboardAvoidingView,
   Platform,
   PanResponder,
@@ -101,6 +100,7 @@ export class ReactNativeModal extends Component {
       this.state = { ...this.state, pan: new Animated.ValueXY() };
       this.buildPanResponder();
     }
+    this.buildBackdropPanResponder();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -204,6 +204,18 @@ export class ReactNativeModal extends Component {
           bounciness: 0
         }).start();
       }
+    });
+  };
+
+  buildBackdropPanResponder = () => {
+    this.backdropPanResponder = PanResponder.create({
+      onStartShouldSetPanResponder: (evt, gestureState) => true,
+      onMoveShouldSetPanResponder: (evt, gestureState) => true,
+      onPanResponderTerminationRequest: (evt, gestureState) => false,
+      onPanResponderRelease: (evt, gestureState) => {
+        this.props.onBackdropPress();
+      },
+      onShouldBlockNativeResponder: (evt, gestureState) => true
     });
   };
 
@@ -409,7 +421,7 @@ export class ReactNativeModal extends Component {
         onRequestClose={onBackButtonPress}
         {...otherProps}
       >
-        <TouchableWithoutFeedback onPress={onBackdropPress}>
+        <View {...this.backdropPanResponder.panHandlers}>
           <View
             ref={ref => (this.backdropRef = ref)}
             useNativeDriver={useNativeDriver}
@@ -424,7 +436,7 @@ export class ReactNativeModal extends Component {
               }
             ]}
           />
-        </TouchableWithoutFeedback>
+        </View>
 
         {avoidKeyboard && (
           <KeyboardAvoidingView
