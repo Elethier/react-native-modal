@@ -213,7 +213,9 @@ export class ReactNativeModal extends Component {
       onMoveShouldSetPanResponder: (evt, gestureState) => true,
       onPanResponderTerminationRequest: (evt, gestureState) => false,
       onPanResponderRelease: (evt, gestureState) => {
-        this.props.onBackdropPress();
+        if (gestureState.dx === 0 && gestureState.dy === 0) {
+          this.props.onBackdropPress();
+        }
       },
       onShouldBlockNativeResponder: (evt, gestureState) => true
     });
