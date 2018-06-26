@@ -15,6 +15,7 @@ import {
   registerAnimation,
   createAnimation
 } from "react-native-animatable";
+import ExtraDimensions from "react-native-extra-dimensions-android";
 import * as ANIMATION_DEFINITIONS from "./animations";
 
 import styles from "./index.style.js";
@@ -92,8 +93,14 @@ export class ReactNativeModal extends Component {
   state = {
     showContent: true,
     isVisible: false,
-    deviceWidth: Dimensions.get("window").width,
-    deviceHeight: Dimensions.get("window").height,
+    deviceWidth:
+      Platform.OS === "ios"
+        ? Dimensions.get("window").width
+        : ExtraDimensions.get("REAL_WINDOW_WIDTH"),
+    deviceHeight:
+      Platform.OS === "ios"
+        ? Dimensions.get("window").height
+        : ExtraDimensions.get("REAL_WINDOW_HEIGHT"),
     isSwipeable: this.props.swipeDirection ? true : false,
     pan: null
   };
@@ -286,8 +293,14 @@ export class ReactNativeModal extends Component {
 
   handleDimensionsUpdate = dimensionsUpdate => {
     // Here we update the device dimensions in the state if the layout changed (triggering a render)
-    const deviceWidth = Dimensions.get("window").width;
-    const deviceHeight = Dimensions.get("window").height;
+    const deviceWidth =
+      Platform.OS === "ios"
+        ? Dimensions.get("window").width
+        : ExtraDimensions.get("REAL_WINDOW_WIDTH");
+    const deviceHeight =
+      Platform.OS === "ios"
+        ? Dimensions.get("window").height
+        : ExtraDimensions.get("REAL_WINDOW_HEIGHT");
     if (
       deviceWidth !== this.state.deviceWidth ||
       deviceHeight !== this.state.deviceHeight
