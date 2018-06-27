@@ -445,25 +445,24 @@ export class ReactNativeModal extends Component {
               {
                 backgroundColor: this.state.showContent
                   ? backdropColor
-                  : "transparent",
-                width: deviceWidth,
-                height: deviceHeight
+                  : "transparent"
               }
             ]}
           />
         </View>
+        <View style={styles.contentContainer}>
+          {avoidKeyboard && (
+            <KeyboardAvoidingView
+              behavior={Platform.OS === "ios" ? "padding" : null}
+              pointerEvents="box-none"
+              style={computedStyle.concat([{ margin: 0 }])}
+            >
+              {containerView}
+            </KeyboardAvoidingView>
+          )}
 
-        {avoidKeyboard && (
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : null}
-            pointerEvents="box-none"
-            style={computedStyle.concat([{ margin: 0 }])}
-          >
-            {containerView}
-          </KeyboardAvoidingView>
-        )}
-
-        {!avoidKeyboard && containerView}
+          {!avoidKeyboard && containerView}
+        </View>
       </Modal>
     );
   }
