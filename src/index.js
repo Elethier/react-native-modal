@@ -50,6 +50,7 @@ export class ReactNativeModal extends Component {
     deviceHeight: PropTypes.number,
     deviceWidth: PropTypes.number,
     isVisible: PropTypes.bool.isRequired,
+    preventSwipe: PropTypes.bool,
     hideModalContentWhileAnimating: PropTypes.bool,
     onModalShow: PropTypes.func,
     onModalHide: PropTypes.func,
@@ -85,7 +86,8 @@ export class ReactNativeModal extends Component {
     onBackdropPress: () => null,
     onBackButtonPress: () => null,
     swipeThreshold: 100,
-    useNativeDriver: false
+    useNativeDriver: false,
+    preventSwipe: true
   };
 
   // We use an internal state for keeping track of the modal visibility: this allows us to keep
@@ -111,6 +113,8 @@ export class ReactNativeModal extends Component {
     if (this.state.isSwipeable) {
       this.state = { ...this.state, pan: new Animated.ValueXY() };
       this.buildPanResponder();
+    } else if (props.preventSwipe) {
+      this.buildPanInterceptor();
     }
     this.buildBackdropPanResponder(props);
   }
@@ -231,6 +235,16 @@ export class ReactNativeModal extends Component {
         }
       },
       onShouldBlockNativeResponder: (evt, gestureState) => true
+    });
+  };
+
+  buildPanInterceptor = () => {
+    this.panResponder = PanResponder.create({
+      onShouldBlockNativeResponder: (evt, gestureState) => true,
+      onStartShouldSetPanResponder: (evt, gestureState) => false,
+      onMoveShouldSetPanResponder: (evt, gestureState) => false,
+      onPanResponderTerminationRequest: (evt, gestureState) => false,
+      onPanResponderRelease: () => false
     });
   };
 
@@ -402,7 +416,7 @@ export class ReactNativeModal extends Component {
 
     let panHandlers = {};
     let panPosition = {};
-    if (this.state.isSwipeable) {
+    if (this.state.isSwipeable || this.props.preventPanPropagation) {
       panHandlers = { ...this.panResponder.panHandlers };
       panPosition = this.state.pan.getLayout();
     }
